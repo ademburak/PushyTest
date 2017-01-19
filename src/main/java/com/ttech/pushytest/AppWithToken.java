@@ -2,6 +2,8 @@ package com.ttech.pushytest;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ExecutionException;
 
 import javax.net.ssl.SSLException;
@@ -15,14 +17,14 @@ import com.relayrides.pushy.apns.util.TokenUtil;
 
 import io.netty.util.concurrent.Future;
 
-public class App 
-{ 
-    public static void main( String[] args ) throws InterruptedException, ExecutionException
+public class AppWithToken {
+    public static void main( String[] args ) throws InterruptedException, ExecutionException, InvalidKeyException, NoSuchAlgorithmException
     {
     	try {
-			final ApnsClient apnsClient = new ApnsClientBuilder()
-			        .setClientCredentials(new File("/Users/ttacakmak/Desktop/Certificates.p12"), "12345")
-			        .build();
+    		final ApnsClient apnsClient = new ApnsClientBuilder().build();
+			
+    		apnsClient.registerSigningKey(new File("/Users/ttacakmak/Downloads/APNsAuthKey_9ERE4FVETL.p8"),
+    		        "PSE2C9RF4H", "9ERE4FVETL", "com.turkcell.bipdev");
 			
 			final Future<Void> connectFuture = apnsClient.connect(ApnsClient.DEVELOPMENT_APNS_HOST);
 			connectFuture.await();
@@ -36,9 +38,9 @@ public class App
 		        final String payload = payloadBuilder.buildWithDefaultMaximumLength();
 		       // b150d157b7636fdc9073627d529b5763faed97ac7932f569d9370ff869868390
 		       //voip a8a0ab743f133bfd04b4ccb4e15782bc63fbf0519fa353f755776c836dc63a8f
-		        final String token = TokenUtil.sanitizeTokenString("a8a0ab743f133bfd04b4ccb4e15782bc63fbf0519fa353f755776c836dc63a8f");
+		        final String token = TokenUtil.sanitizeTokenString("b9afae5a0c2797eca74da02030680b05db5a670236ae3a77aa844b1f478b690f");
 
-		        pushNotification = new SimpleApnsPushNotification(token, "com.turkcell.bipdev.voip", payload);
+		        pushNotification = new SimpleApnsPushNotification(token, "com.turkcell.bipdev", payload);
 		    }
 			
 			final Future<PushNotificationResponse<SimpleApnsPushNotification>> sendNotificationFuture =
@@ -70,6 +72,5 @@ public class App
     	
     	
     }
-    
     
 }
